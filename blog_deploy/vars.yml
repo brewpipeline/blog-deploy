@@ -2,6 +2,7 @@ ENVIRONMENT:
   TITLE: 
   DESCRIPTION: 
   KEYWORDS: 
+  #Should be specified without ''   [{"test":"test"}]
   ACCORDION_JSON: 
   JWT_SECRET:
   PG_URL: 
