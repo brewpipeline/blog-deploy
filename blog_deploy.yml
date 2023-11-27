@@ -3,21 +3,22 @@
   become: yes
   #become_user: <username> 
   vars_files:
-    - vars.yml
+    - ./variables/blog.yml
+    - ./variables/shared.yml
   environment:
     TITLE: "{{ ENVIRONMENT.TITLE }}"
     DESCRIPTION: "{{ ENVIRONMENT.DESCRIPTION }}"
     KEYWORDS: "{{ ENVIRONMENT.KEYWORDS }}"
     ACCORDION_JSON: "{{ ENVIRONMENT.ACCORDION_JSON | to_json }}"
     JWT_SECRET: "{{ ENVIRONMENT.JWT_SECRET }}"
-    PG_URL: "{{ ENVIRONMENT.PG_URL }}"
-    RABBIT_URL: "{{ ENVIRONMENT.RABBIT_URL }}"
+    PG_URL: "{{ CONNECTION_STRINGS.PG_URL }}"
+    RABBIT_URL: "{{ CONNECTION_STRINGS.RABBIT_URL }}"
+    SITE_URL: "{{ CONNECTION_STRINGS.SITE_URL }}"
     SERVER_ADDRESS: "{{ ENVIRONMENT.SERVER_ADDRESS }}"
-    SITE_URL: "{{ ENVIRONMENT.SITE_URL }}"
     API_URL: "{{ ENVIRONMENT.API_URL }}"
     YANDEX_CLIENT_ID: "{{ ENVIRONMENT.YANDEX_CLIENT_ID }}"
-    TELEGRAM_BOT_TOKEN: "{{ ENVIRONMENT.TELEGRAM_BOT_TOKEN }}"
-    TELEGRAM_BOT_LOGIN: "{{ ENVIRONMENT.TELEGRAM_BOT_LOGIN }}"
+    TELEGRAM_BOT_TOKEN: "{{ TOKENS.TELEGRAM_BOT_TOKEN }}"
+    TELEGRAM_BOT_LOGIN: "{{ TOKENS.TELEGRAM_BOT_LOGIN }}"
   tasks:
     - name: Show environment variables
       debug:
@@ -25,7 +26,7 @@
 
     - name: Prepare UI repository
       import_tasks:
-        file: prepare_repo.yml
+        file: .//blog_deploy//prepare_repo.yml
       vars:
         repository_path: "{{ PATHS.BLOG_UI }}" 
         repository_url: "{{ REPOS.BLOG_UI }}"
@@ -33,24 +34,24 @@
 
     - name: Prepare server repository
       import_tasks:
-        file: prepare_repo.yml
+        file: .//blog_deploy//prepare_repo.yml
       vars:
         repository_path: "{{ PATHS.BLOG_SERVER }}" 
         repository_url: "{{ REPOS.BLOG_SERVER }}"
 
     - name: Replace Server dependency in toml file 
-      command: python3 server_cargo_edit.py {{ PATHS.BLOG_SERVER }}//blog-server-api//Cargo.toml
+      command: python3 .//blog_deploy//server_cargo_edit.py {{ PATHS.BLOG_SERVER }}//blog-server-api//Cargo.toml
 
     - name: Replace UI dependencies and features in toml file 
       command: 
         argv:
           - "python3"
-          - "ui_cargo_edit.py"
+          - ".//blog_deploy//ui_cargo_edit.py"
           - "{{ PATHS.BLOG_UI }}//Cargo.toml"
           - "{{ UI_TOML.DEPENDENCIES }}"
           - "{{ UI_TOML.FEATURES }}"
 
-    - name: Build UI using trunc
+    - name: Build UI using trunK
       command: 
         cmd: trunk build --release
       args:
@@ -86,18 +87,19 @@
 
     - name: update .service file and restart service
       import_tasks:
-        file: deploy_linux_daemon.yml
+        file: .//shared//deploy_linux_daemon.yml
       vars:
         working_directory: "{{ DAEMON.WORKING_DIRECTORY }}"
         exec_start: "{{ DAEMON.EXEC_START }}"
         service_name: "{{ DAEMON.SERVICE_NAME }}"
         services_folder: "{{ DAEMON.SERVICES_FOLDER }}"
         syslog_identifier: "{{ DAEMON.SYSLOG_IDENTIFIER }}"
+        description: "{{ DAEMON.DESCRIPTION }}"
 
     - name: Delete extra files in NGinxFolder
       command: 
         argv: 
           - "python3" 
-          - "delete_old_nginx.py"
+          - ".//blog_deploy//delete_old_nginx.py"
           - "{{ PATHS.NGINX }}"
           - "{{ ui_files.files | map(attribute='path') | map('basename') | join(',') }}"
