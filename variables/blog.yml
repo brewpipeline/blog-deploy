@@ -5,14 +5,10 @@ ENVIRONMENT:
   #Should be specified without ''   [{"test":"test"}]
   ACCORDION_JSON: 
   JWT_SECRET:
-  PG_URL: 
-  RABBIT_URL:
   SERVER_ADDRESS: 
-  SITE_URL: 
   API_URL: 
-  YANDEX_CLIENT_ID:
-  TELEGRAM_BOT_TOKEN: 
-  TELEGRAM_BOT_LOGIN:
+  YANDEX_CLIENT_ID: 
+
 
 BUILD_BRANCH: 
 
@@ -34,6 +30,7 @@ SERVER:
 
 DAEMON:
   #replace with concatenation of root path with subpath
+  DESCRIPTION:
   WORKING_DIRECTORY: 
   EXEC_START: 
   SERVICE_NAME: 

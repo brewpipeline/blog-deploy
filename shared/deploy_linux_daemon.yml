@@ -6,7 +6,7 @@
 
 - name: Copy template
   template:
-    src: template_blog.service.j2
+    src: ".//templates//linux.service.j2"
     dest: "{{ services_folder }}//{{ service_name }}.service"
 
 - name: Reload systemd
