@@ -16,6 +16,7 @@
       systemd:
         name: "{{ DAEMON.SERVICE_NAME }}"
         state: stopped
+      ignore_errors: yes #in case service is not running
 
     - name: publish NotificationService
       command: 
