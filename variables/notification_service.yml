@@ -13,7 +13,7 @@ DAEMON:
 #case-sensitive
 APPSETTINGS:
   ConnectionStrings:
-    PgConnection: "{{ CONNECTION_STRINGS.PG_URL }}"
+    PgConnection: "{{ CONNECTION_STRINGS.PG_URL_DOTNET }}"
     BotToken: "{{ TOKENS.TELEGRAM_BOT_TOKEN }}"
 
   NotificationServiceSettings:
