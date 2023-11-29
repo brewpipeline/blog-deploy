@@ -1,0 +1,12 @@
+- name: Hard reset repository {{ repository_path }}
+  git:
+    repo: "{{ repository_url }}"
+    dest: "{{ repository_path }}"
+    version: HEAD
+    force: yes
+
+- name: Clone repository {{ repository_path }}
+  git:
+    repo: "{{ repository_url }}"
+    dest: "{{ repository_path }}"
+    version: "{{ build_branch | default('main') }}"

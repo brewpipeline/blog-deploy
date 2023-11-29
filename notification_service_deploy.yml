@@ -1,0 +1,31 @@
+- name: Deploy NotificationService
+  hosts: localhost
+  become: yes
+  become_user: drandubaser 
+  vars_files:
+    - ./variables/shared.yml
+    - ./variables/notification_service.yml
+  tasks:
+    - name: Prepare repository
+      import_tasks:
+        file: .//notification_service_deploy//prepare_repo.yml
+      vars:
+        repository_url: "{{ REPOSITORY_URL }}"
+        repository_path: "{{ REPOSITORY_PATH }}"
+
+    - name: publish NotificationService
+      command: 
+        cmd: "dotnet publish -c Release -r linux-x64 -o {{ PUBLISH_PATH }}"
+      args:
+        chdir: "{{ REPOSITORY_PATH }}//NotificationService"
+
+    - name: update .service file and restart service
+      import_tasks:
+        file: .//shared//deploy_linux_daemon.yml
+      vars:
+        working_directory: "{{ DAEMON.WORKING_DIRECTORY }}"
+        exec_start: "{{ DAEMON.EXEC_START }}"
+        service_name: "{{ DAEMON.SERVICE_NAME }}"
+        services_folder: "{{ DAEMON.SERVICES_FOLDER }}"
+        syslog_identifier: "{{ DAEMON.SYSLOG_IDENTIFIER }}"
+        description: "{{ DAEMON.DESCRIPTION }}"

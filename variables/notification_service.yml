@@ -1,0 +1,11 @@
+REPOSITORY_URL: https://github.com/YoshkiMatryoshki/BlogNotificationService
+REPOSITORY_PATH: 
+PUBLISH_PATH:
+
+DAEMON:
+  DESCRIPTION: 
+  WORKING_DIRECTORY: "{{ PUBLISH_PATH }}"
+  EXEC_START:
+  SERVICE_NAME: "NotificationService" 
+  SERVICES_FOLDER: /etc/systemd/system
+  SYSLOG_IDENTIFIER: 
