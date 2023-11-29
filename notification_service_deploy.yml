@@ -1,7 +1,6 @@
 - name: Deploy NotificationService
   hosts: localhost
   become: yes
-  become_user: drandubaser 
   vars_files:
     - ./variables/shared.yml
     - ./variables/notification_service.yml
@@ -13,11 +12,25 @@
         repository_url: "{{ REPOSITORY_URL }}"
         repository_path: "{{ REPOSITORY_PATH }}"
 
+    - name: Stop already running service
+      systemd:
+        name: "{{ DAEMON.SERVICE_NAME }}"
+        state: stopped
+      ignore_errors: yes #in case service is not running
+
     - name: publish NotificationService
       command: 
         cmd: "dotnet publish -c Release -r linux-x64 -o {{ PUBLISH_PATH }}"
       args:
         chdir: "{{ REPOSITORY_PATH }}//NotificationService"
+
+    - name: Edit AppSettings 
+      command:
+        argv :
+          - "python3"
+          - ".//notification_service_deploy//appsettings_edit.py"
+          - "{{ PUBLISH_PATH }}//appsettings.json"
+          - "{{ APPSETTINGS | to_json }}"
 
     - name: update .service file and restart service
       import_tasks:
@@ -28,12 +41,4 @@
         service_name: "{{ DAEMON.SERVICE_NAME }}"
         services_folder: "{{ DAEMON.SERVICES_FOLDER }}"
         syslog_identifier: "{{ DAEMON.SYSLOG_IDENTIFIER }}"
-        description: "{{ DAEMON.DESCRIPTION }}"
-
-    - name: Edit AppSettings 
-      command:
-        argv :
-          - "python3"
-          - ".//notification_service_deploy//appsettings_edit.py"
-          - "{{ PUBLISH_PATH }}//appsettings.json"
-          - "{{ APPSETTINGS | to_json }}"
+        description: "{{ DAEMON.DESCRIPTION }}"          
