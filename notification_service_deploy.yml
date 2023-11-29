@@ -29,3 +29,11 @@
         services_folder: "{{ DAEMON.SERVICES_FOLDER }}"
         syslog_identifier: "{{ DAEMON.SYSLOG_IDENTIFIER }}"
         description: "{{ DAEMON.DESCRIPTION }}"
+
+    - name: Edit AppSettings 
+      command:
+        argv :
+          - "python3"
+          - ".//notification_service_deploy//appsettings_edit.py"
+          - "{{ PUBLISH_PATH }}//appsettings.json"
+          - "{{ APPSETTINGS | to_json }}"
