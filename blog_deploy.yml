@@ -85,6 +85,23 @@
         dest: "{{ PATHS.NGINX }}"
       with_items: "{{ ui_files.files }}"
 
+    - name: Capture snippets
+      find:
+        paths: "{{ PATHS.BLOG_UI }}//dist//snippets"
+        file_type: directory
+        recurse: no
+      register: snippets_dir  
+
+    - name: Debug snippets folder
+      debug: 
+        msg: "{{ snippets_dir }}"             
+
+    - name: Copy snippets
+      copy:
+        src: "{{ item.path }}"
+        dest: "{{ PATHS.NGINX }}//snippets"
+      with_items: "{{ snippets_dir.files }}"
+
     - name: update .service file and restart service
       import_tasks:
         file: .//shared//deploy_linux_daemon.yml
@@ -103,3 +120,11 @@
           - ".//blog_deploy//delete_old_nginx.py"
           - "{{ PATHS.NGINX }}"
           - "{{ ui_files.files | map(attribute='path') | map('basename') | join(',') }}"
+
+    - name: Delete extra snippets in NGinxFolder
+      command: 
+        argv: 
+          - "python3" 
+          - ".//blog_deploy//delete_old_nginx.py"
+          - "{{ PATHS.NGINX }}//snippets"
+          - "{{ snippets_dir.files | map(attribute='path') | map('basename') | join(',') }}"          
