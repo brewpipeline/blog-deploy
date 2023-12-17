@@ -1,6 +1,6 @@
 
 import sys
-import os
+import os, shutil
 
 def main():
     folder_path = sys.argv[1]
@@ -13,7 +13,7 @@ def main():
             # TODO deploy nginx entirely with ansible?
             if file_name not in new_file_names and any(file_name.startswith(new_file_name[:6]) for new_file_name in new_file_names):
                 file_path = os.path.join(folder_path, file_name)
-                os.remove(file_path)
+                os.remove(file_path) if os.path.isfile(file_path) else shutil.rmtree(file_path)
     except FileNotFoundError:
         print(f"The folder '{folder_path}' does not exist.")
 
