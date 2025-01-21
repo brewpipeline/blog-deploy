@@ -1,6 +1,7 @@
 - name: Stop already running service
   systemd:
     name: "{{ service_name }}"
+    scope: user
     state: stopped
   ignore_errors: yes #in case service is not running
 
@@ -10,10 +11,11 @@
     dest: "{{ services_folder }}//{{ service_name }}.service"
 
 - name: Reload systemd
-  become: yes
-  command: systemctl daemon-reload
+  command: systemctl --user daemon-reload
 
 - name: Start the updated service
   systemd:
     name: "{{ service_name }}"
+    scope: user
+    enabled: yes
     state: started
