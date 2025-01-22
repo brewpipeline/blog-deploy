@@ -2,12 +2,13 @@
 Description= {{ description }}
 
 [Service]
+ExecStartPre=/bin/sleep 15
 WorkingDirectory={{ working_directory }}
 ExecStart={{ exec_start }}
-Restart=no
+Restart=always
+RestartSec=15
 KillSignal=SIGINT
 SyslogIdentifier={{ syslog_identifier }}
-User=root
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
