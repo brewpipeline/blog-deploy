@@ -19,6 +19,7 @@
     YANDEX_CLIENT_ID: "{{ ENVIRONMENT.YANDEX_CLIENT_ID }}"
     TELEGRAM_BOT_TOKEN: "{{ TOKENS.TELEGRAM_BOT_TOKEN }}"
     TELEGRAM_BOT_LOGIN: "{{ TOKENS.TELEGRAM_BOT_LOGIN }}"
+    OPENAI_API_KEY: "{{ ENVIRONMENT.OPENAI_API_KEY }}"
   tasks:
     - name: Show environment variables
       debug:
