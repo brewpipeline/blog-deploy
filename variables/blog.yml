@@ -7,7 +7,8 @@ ENVIRONMENT:
   JWT_SECRET:
   SERVER_ADDRESS: 
   API_URL: 
-  YANDEX_CLIENT_ID: 
+  YANDEX_CLIENT_ID:
+  OPENAI_API_KEY:
 
 
 BUILD_BRANCH: 
@@ -22,7 +23,6 @@ PATHS:
   NGINX:
 
 UI_TOML:
-  DEPENDENCIES: 'blog-generic = { path = "../blog-server/blog-generic" }'
   FEATURES: 'default = ["hydration", "telegram"]'
 
 SERVER:

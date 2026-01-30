@@ -5,13 +5,22 @@ def modify_dependencies(filename):
         with open(filename, 'r') as file:
             lines = file.readlines()
 
+        in_section = False
         for i, line in enumerate(lines):
-            if '[dependencies.blog-ui]' in line:
-                # Add # in the next line
-                lines[i + 1] = '#' + lines[i + 1].lstrip()
+            stripped = line.strip()
 
-                # Remove # at the beginning of the second line
-                lines[i + 2] = lines[i + 2].lstrip('#')
+            if '[dependencies.blog-ui]' in stripped:
+                in_section = True
+                continue
+
+            if in_section and stripped.startswith('['):
+                break
+
+            if in_section:
+                if stripped.startswith('git = ') or stripped.startswith('tag = '):
+                    lines[i] = '#' + lines[i]
+                elif stripped.startswith('#path'):
+                    lines[i] = lines[i].replace('#', '', 1)
 
         with open(filename, 'w') as file:
             file.writelines(lines)
