@@ -43,13 +43,12 @@
     - name: Replace Server dependency in toml file 
       command: python3 .//blog_deploy//server_cargo_edit.py {{ PATHS.BLOG_SERVER }}//blog-server-api//Cargo.toml
 
-    - name: Replace UI dependencies and features in toml file 
-      command: 
+    - name: Replace UI features in toml file
+      command:
         argv:
           - "python3"
           - ".//blog_deploy//ui_cargo_edit.py"
           - "{{ PATHS.BLOG_UI }}//Cargo.toml"
-          - "{{ UI_TOML.DEPENDENCIES }}"
           - "{{ UI_TOML.FEATURES }}"
 
     - name: Build UI using trunK
