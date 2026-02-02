@@ -29,16 +29,19 @@
       import_tasks:
         file: .//blog_deploy//prepare_repo.yml
       vars:
-        repository_path: "{{ PATHS.BLOG_UI }}" 
+        repository_path: "{{ PATHS.BLOG_UI }}"
         repository_url: "{{ REPOS.BLOG_UI }}"
-        build_branch: "{{ BUILD_BRANCH }}"
+        build_branch: "{{ UI_BUILD_BRANCH }}"
+        build_tag: "{{ UI_BUILD_TAG }}"
 
     - name: Prepare server repository
       import_tasks:
         file: .//blog_deploy//prepare_repo.yml
       vars:
-        repository_path: "{{ PATHS.BLOG_SERVER }}" 
+        repository_path: "{{ PATHS.BLOG_SERVER }}"
         repository_url: "{{ REPOS.BLOG_SERVER }}"
+        build_branch: "{{ SERVER_BUILD_BRANCH }}"
+        build_tag: "{{ SERVER_BUILD_TAG }}"
 
     - name: Replace Server dependency in toml file 
       command: python3 .//blog_deploy//server_cargo_edit.py {{ PATHS.BLOG_SERVER }}//blog-server-api//Cargo.toml
