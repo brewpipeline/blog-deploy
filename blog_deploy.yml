@@ -65,7 +65,7 @@
 
     - name: Build Server
       command: 
-        cmd: "cargo build --release --features {{ SERVER.FEATURES }}"
+        cmd: "cargo build --release --no-default-features --features {{ SERVER.FEATURES }}"
       args:
         chdir: "{{ PATHS.BLOG_SERVER }}"      
 
