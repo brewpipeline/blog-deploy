@@ -11,7 +11,12 @@ ENVIRONMENT:
   OPENAI_API_KEY:
 
 
-BUILD_BRANCH: 
+UI_BUILD_BRANCH:
+UI_BUILD_TAG:
+SERVER_BUILD_BRANCH:
+SERVER_BUILD_TAG:
+
+LANG: lang_ru
 
 REPOS:
   BLOG_SERVER: https://github.com/tikitko/blog-server
@@ -23,10 +28,10 @@ PATHS:
   NGINX:
 
 UI_TOML:
-  FEATURES: 'default = ["hydration", "telegram"]'
+  FEATURES: 'default = ["hydration", "telegram", "{{ LANG }}"]'
 
 SERVER:
-  FEATURES: '"ssr","telegram"'
+  FEATURES: '"ssr","telegram","{{ LANG }}"'
 
 DAEMON:
   #replace with concatenation of root path with subpath

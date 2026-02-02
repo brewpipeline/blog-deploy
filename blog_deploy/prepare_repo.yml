@@ -9,7 +9,7 @@
   git:
     repo: "{{ repository_url }}"
     dest: "{{ repository_path }}"
-    version: "{{ build_branch | default('main') }}"
+    version: "{{ build_tag | default(build_branch | default('main', true), true) }}"
 
 - name: Remove target folder in repository
   file: 
