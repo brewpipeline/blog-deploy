@@ -1,0 +1,88 @@
+name: blog
+
+x-restart: &restart unless-stopped
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: *restart
+    logging: *logging
+    networks: [internal]
+    environment:
+      POSTGRES_DB: blog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d blog"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  images-processor:
+    build:
+      context: https://github.com/tikitko/images-processor-service.git#${IMAGES_PROCESSOR_REF:-main}
+      args:
+        DOMAIN: ${IMAGES_DOMAIN:?IMAGES_DOMAIN is required}
+    restart: *restart
+    logging: *logging
+    networks: [internal]
+    environment:
+      PORT: "80"
+    ports:
+      - "${IMAGES_PORT:-8081}:80"
+    volumes:
+      - images-data:/images
+    stop_grace_period: 20s
+
+  blog-server:
+    build:
+      context: https://github.com/tikitko/blog-server.git#${BLOG_SERVER_REF:-main}
+      args:
+        DOMAIN: ${BLOG_DOMAIN:?BLOG_DOMAIN is required}
+        IMAGES_PROCESSOR_URL: https://${IMAGES_DOMAIN}/
+        FEATURES: ${FEATURES:-telegram,chatgpt,lang_ru}
+        TITLE: ${TITLE:-TIKITKO blog}
+        DESCRIPTION: '${DESCRIPTION:-Блог от «гиков» для «гиков», говорим на темы, начиная с программирования и компьютерной графики, заканчивая играми и алкогольными посиделками в одиночестве.}'
+        KEYWORDS: '${KEYWORDS:-tikitko, блог, программирование, ПО, код, Swift, Rust, компьютерная графика, верстка, алкоголь, игры}'
+        ACCORDION_JSON: '[{"title":"О блоге","body":"<strong>TIKITKO blog</strong> - блог от «гиков» для «гиков», говорим на темы, начиная с программирования и компьютерной графики, заканчивая играми и алкогольными посиделками в одиночестве. 🤫"},{"title":"Об авторах","body":"Главным автором являюсь я - <a href=\"https://about.tikitko.dev\">Никита</a>, но иногда тут будут появляться и умные люди, которых я смог уломать что-то написать! 🤑"},{"title":"Исходный код","body":"<a href=\"https://github.com/tikitko/blog-ui\">Исходный код</a> блога полностью открыт и может быть использован с учетом лицензии MIT. Будем рады вашему вкладу! ⛵"}]'
+        TELEGRAM_BOT_LOGIN: ${TELEGRAM_BOT_LOGIN:-}
+        YANDEX_CLIENT_ID: ${YANDEX_CLIENT_ID:-}
+        LOGO_URL: ${LOGO_URL:-}
+        THEME: ${THEME:-}
+        COLOR_PRIMARY_BG: ${COLOR_PRIMARY_BG:-}
+        COLOR_BODY_BG: ${COLOR_BODY_BG:-}
+        COLOR_SECOND_BG: ${COLOR_SECOND_BG:-}
+        COLOR_LIGHT: ${COLOR_LIGHT:-}
+        COLOR_BODY: ${COLOR_BODY:-}
+    restart: *restart
+    logging: *logging
+    networks: [internal]
+    environment:
+      PORT: "80"
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      PG_URL: postgres://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/blog
+      RABBIT_URL: ${RABBIT_URL:-placeholder}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    ports:
+      - "${BLOG_PORT:-8080}:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    stop_grace_period: 30s
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  images-data:
